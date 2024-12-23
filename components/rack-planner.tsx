@@ -9,6 +9,7 @@ interface SlotProps {
     label: string;
     size: number;
     startPosition: number;
+    vectorUrl?: string;
   };
 }
 
@@ -19,6 +20,12 @@ function Slot({ position, equipment }: SlotProps) {
         className="flex flex-row items-center gap-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-md p-4"
         style={{
           aspectRatio: `10/${equipment.size}`,
+          ...(equipment.vectorUrl && {
+            backgroundImage: `url(${equipment.vectorUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }),
         }}
       >
         <span className="text-sm font-medium">{equipment.label}</span>

@@ -13,6 +13,8 @@ interface EquipmentData {
   model: string;
   size: string;
   color: string;
+  logoUrl?: string;
+  vectorUrl?: string;
 }
 
 export default function SettingsPanel() {
@@ -53,6 +55,7 @@ export default function SettingsPanel() {
       id: `${equipmentItem.id}-${Date.now()}`,
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
+      vectorUrl: equipmentItem.vectorUrl,
     });
   };
 
@@ -132,11 +135,18 @@ export default function SettingsPanel() {
                   key={item.id}
                   className="flex flex-row items-center justify-between py-2"
                 >
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {item.size}U
-                    </span>
+                  <div className="flex flex-row items-center gap-3">
+                    <img
+                      src={item.logoUrl || "/rackplan-logo-white.svg"}
+                      alt={`${item.label} logo`}
+                      className="w-8 h-8 object-contain rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{item.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.size}U
+                      </span>
+                    </div>
                   </div>
                   <Button
                     variant="outline"

@@ -7,6 +7,7 @@ interface RackItem {
   label: string;
   size: number;
   startPosition: number;
+  vectorUrl?: string;
 }
 
 interface RackContextType {
