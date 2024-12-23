@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rack Plan — Plan your Homelab Rack Server",
+  title: "Rack Plan — Plan & Design Your Homelab Rack",
   description:
-    "A free and open source tool to plan the layout of your Homelab Rack Server.",
+    "A free and open source tool to plan and design the layout of your homelab rack.",
 };
 
 export default function RootLayout({
