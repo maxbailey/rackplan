@@ -5,13 +5,6 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { useState, useEffect } from "react";
 import { useRack } from "../context/rack-context";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface EquipmentData {
   id: string;
@@ -23,7 +16,7 @@ interface EquipmentData {
 }
 
 export default function SettingsPanel() {
-  const { slotCount, updateSlotCount, addItem } = useRack();
+  const { slotCount, updateSlotCount, addItem, items } = useRack();
   const [inputValue, setInputValue] = useState<string>(slotCount.toString());
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,15 +48,43 @@ export default function SettingsPanel() {
     }
   };
 
-  const handleEquipmentSelect = (equipmentId: string) => {
-    const selectedEquipment = equipment.find((item) => item.id === equipmentId);
-    if (selectedEquipment) {
-      addItem({
-        id: `${selectedEquipment.id}-${Date.now()}`,
-        label: selectedEquipment.label,
-        size: parseInt(selectedEquipment.size),
-      });
+  const handleInsert = (equipmentItem: EquipmentData) => {
+    addItem({
+      id: `${equipmentItem.id}-${Date.now()}`,
+      label: equipmentItem.label,
+      size: parseInt(equipmentItem.size),
+    });
+  };
+
+  const canFitEquipment = (size: number) => {
+    // Start from the bottom and check each position
+    for (let position = slotCount; position > 0; position--) {
+      // Check if this position and the required slots above it are free
+      let isFree = true;
+      for (let offset = 0; offset < size; offset++) {
+        const checkPosition = position - offset;
+        if (checkPosition <= 0) {
+          isFree = false;
+          break;
+        }
+
+        const isOccupied = items.some(
+          (item) =>
+            checkPosition <= item.startPosition &&
+            checkPosition > item.startPosition - item.size
+        );
+
+        if (isOccupied) {
+          isFree = false;
+          break;
+        }
+      }
+
+      if (isFree) {
+        return true;
+      }
     }
+    return false;
   };
 
   return (
@@ -94,24 +115,42 @@ export default function SettingsPanel() {
           </div>
         </form>
       </Card>
-      <Card className="flex flex-col p-6 gap-3 sticky top-6">
+      <Card className="flex flex-col p-6 gap-3">
         <h1 className="text-xl font-medium tracking-tight text-foreground">
           Insert Equipment
         </h1>
-        <Select onValueChange={handleEquipmentSelect} disabled={loading}>
-          <SelectTrigger className="w-full">
-            <SelectValue
-              placeholder={loading ? "Loading..." : "Select Equipment"}
-            />
-          </SelectTrigger>
-          <SelectContent>
-            {equipment.map((item) => (
-              <SelectItem key={item.id} value={item.id}>
-                {item.label} ({item.size}U)
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {loading ? (
+          <div className="text-sm text-muted-foreground">Loading...</div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {equipment.map((item) => {
+              const size = parseInt(item.size);
+              const canFit = canFitEquipment(size);
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex flex-row items-center justify-between py-2"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {item.size}U
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleInsert(item)}
+                    disabled={!canFit}
+                  >
+                    {canFit ? "Insert" : "No Space"}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Card>
     </div>
   );
