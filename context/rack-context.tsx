@@ -14,7 +14,7 @@ interface RackContextType {
   slotCount: number;
   updateSlotCount: (size: number) => void;
   items: RackItem[];
-  addItem: (item: Omit<RackItem, "startPosition">) => void;
+  addItem: (item: Omit<RackItem, "startPosition">, position?: number) => void;
   removeItem: (id: string) => void;
 }
 
@@ -30,8 +30,17 @@ export function RackProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addItem = (item: Omit<RackItem, "startPosition">) => {
-    // Find first available slot from bottom up
+  const addItem = (
+    item: Omit<RackItem, "startPosition">,
+    position?: number
+  ) => {
+    if (position !== undefined) {
+      // Use the specified position directly
+      setItems((prev) => [...prev, { ...item, startPosition: position }]);
+      return;
+    }
+
+    // Original behavior for when no position is specified
     let startPosition = slotCount;
     while (startPosition > 0) {
       const isSlotAvailable = !items.some(

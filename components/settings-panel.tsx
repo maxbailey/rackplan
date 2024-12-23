@@ -123,7 +123,9 @@ export default function SettingsPanel() {
           Insert Equipment
         </h1>
         {loading ? (
-          <div className="text-sm text-muted-foreground">Loading...</div>
+          <div className="flex items-center justify-center w-full">
+            <img src="/loading-ring.svg" alt="Loading" />
+          </div>
         ) : (
           <div className="flex flex-col gap-2">
             {equipment.map((item) => {
