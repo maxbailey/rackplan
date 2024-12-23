@@ -1,24 +1,29 @@
-import BrandSidebar from "@/components/brand-sidebar";
+import BrandPanel from "@/components/brand-panel";
+import RackPlanner from "@/components/rack-planner";
+import SettingsPanel from "@/components/settings-panel";
+import { RackProvider } from "@/context/rack-context";
 
 export default function Home() {
   return (
-    <div className="container">
-      <div className="flex flex-row gap-6 p-6">
-        {/* Brand Sidebar */}
-        <div className="flex-1">
-          <BrandSidebar />
-        </div>
+    <RackProvider>
+      <div className="container">
+        <div className="flex flex-row items-stretch gap-6 p-6">
+          {/* Brand Sidebar */}
+          <div className="flex-1">
+            <BrandPanel />
+          </div>
 
-        {/* Rack Plan */}
-        <div className="w-[548px] flex-shrink-0">
-          <p>hello world</p>
-        </div>
+          {/* Rack Plan */}
+          <div className="w-[648px] flex-shrink-0">
+            <RackPlanner />
+          </div>
 
-        {/* Right Sidebar */}
-        <div className="flex-1">
-          <p>right sidebar</p>
+          {/* Right Sidebar */}
+          <div className="flex-1">
+            <SettingsPanel />
+          </div>
         </div>
       </div>
-    </div>
+    </RackProvider>
   );
 }

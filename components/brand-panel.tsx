@@ -6,12 +6,12 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { SunIcon, MoonIcon, Github } from "lucide-react";
 
-export default function BrandSidebar() {
+export default function BrandPanel() {
   const { setTheme, theme } = useTheme();
 
   return (
     <>
-      <Card>
+      <Card className="sticky top-6">
         <div className="flex flex-row justify-between items-center p-6 border-b border-border">
           <div className="flex flex-row gap-2 items-center">
             <Image
@@ -56,7 +56,6 @@ export default function BrandSidebar() {
             Rack Plan is a simple, open-source drag-and-drop tool designed to
             help you plan your homelab server rack with ease. Quickly arrange
             servers, switches, and other components to visualize your setup.
-            Consider leaving a star on GitHub.
           </p>
           <Button
             variant="outline"
