@@ -34,9 +34,9 @@ function Slot({
     slots.forEach((slot) => {
       const slotPosition = parseInt(slot.getAttribute("data-slot") || "0");
       if (slotPosition <= position && slotPosition > position - dragSize) {
-        slot.classList.add("bg-neutral-300", "dark:bg-neutral-700");
+        slot.classList.add("bg-neutral-300", "dark:bg-neutral-600");
       } else {
-        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-700");
+        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
       }
     });
   };
@@ -46,7 +46,7 @@ function Slot({
     if (!relatedTarget?.closest(".rack-planner")) {
       const slots = document.querySelectorAll(`[data-slot]`);
       slots.forEach((slot) => {
-        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-700");
+        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
       });
     }
   };
@@ -64,7 +64,7 @@ function Slot({
           e.currentTarget.classList.remove("opacity-50");
           const slots = document.querySelectorAll(`[data-slot]`);
           slots.forEach((slot) => {
-            slot.classList.remove("bg-neutral-300", "dark:bg-neutral-700");
+            slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
           });
           onDragStart(1);
         }}
@@ -137,7 +137,7 @@ function Slot({
       onDrop={(e) => {
         const slots = document.querySelectorAll(`[data-slot]`);
         slots.forEach((slot) => {
-          slot.classList.remove("bg-neutral-300", "dark:bg-neutral-700");
+          slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
         });
         onDrop(e);
       }}
