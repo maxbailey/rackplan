@@ -3,8 +3,9 @@
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRack } from "../context/rack-context";
+import { DownloadIcon, FileJson } from "lucide-react";
 
 interface EquipmentData {
   id: string;
@@ -17,11 +18,69 @@ interface EquipmentData {
   vectorUrl?: string;
 }
 
+interface RackState {
+  slotCount: number;
+  items: {
+    id: string;
+    label: string;
+    size: number;
+    startPosition?: number;
+    vectorUrl?: string;
+  }[];
+}
+
 export default function SettingsPanel() {
-  const { slotCount, updateSlotCount, addItem, items } = useRack();
+  const { slotCount, updateSlotCount, addItem, items, updateItems } = useRack();
   const [inputValue, setInputValue] = useState<string>(slotCount.toString());
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleSave = () => {
+    const state: RackState = {
+      slotCount,
+      items: items.map((item) => ({
+        id: item.id,
+        label: item.label,
+        size: item.size,
+        startPosition: item.startPosition,
+        vectorUrl: item.vectorUrl,
+      })),
+    };
+
+    const blob = new Blob([JSON.stringify(state, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `rackplan-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const state: RackState = JSON.parse(e.target?.result as string);
+        updateSlotCount(state.slotCount);
+        setInputValue(state.slotCount.toString());
+        updateItems(state.items);
+      } catch (error) {
+        console.error("Invalid file format:", error);
+        alert(
+          "Invalid file format. Please select a valid rack plan JSON file."
+        );
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
 
   useEffect(() => {
     const fetchEquipment = async () => {
@@ -60,9 +119,7 @@ export default function SettingsPanel() {
   };
 
   const canFitEquipment = (size: number) => {
-    // Start from the bottom and check each position
     for (let position = slotCount; position > 0; position--) {
-      // Check if this position and the required slots above it are free
       let isFree = true;
       for (let offset = 0; offset < size; offset++) {
         const checkPosition = position - offset;
@@ -73,8 +130,8 @@ export default function SettingsPanel() {
 
         const isOccupied = items.some(
           (item) =>
-            checkPosition <= item.startPosition &&
-            checkPosition > item.startPosition - item.size
+            checkPosition <= (item.startPosition ?? 0) &&
+            checkPosition > (item.startPosition ?? 0) - item.size
         );
 
         if (isOccupied) {
@@ -92,7 +149,35 @@ export default function SettingsPanel() {
 
   return (
     <div className="flex flex-col gap-6 sticky top-6">
-      <Card className="flex flex-col p-6 gap-2">
+      <div className="flex gap-3">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleSave}
+          disabled={items.length === 0}
+        >
+          <DownloadIcon className="w-4 h-4" />
+          Save JSON
+        </Button>
+        <div className="relative w-full">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => document.getElementById("file-upload")?.click()}
+          >
+            <FileJson className="w-4 h-4" />
+            Load JSON
+          </Button>
+          <input
+            type="file"
+            id="file-upload"
+            accept=".json"
+            onChange={handleLoad}
+            className="hidden"
+          />
+        </div>
+      </div>
+      <Card className="flex flex-col p-6 gap-4">
         <h1 className="text-xl font-medium tracking-tight text-foreground">
           Settings
         </h1>
@@ -139,7 +224,7 @@ export default function SettingsPanel() {
                 >
                   <div className="flex flex-row items-center gap-3">
                     <img
-                      src={item.logoUrl || "/rackplan-logo-white.svg"}
+                      src={item.logoUrl || "/rp-avatar.svg"}
                       alt={`${item.label} logo`}
                       className="w-8 h-8 object-contain rounded-full"
                     />

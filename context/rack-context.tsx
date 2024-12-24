@@ -6,7 +6,7 @@ interface RackItem {
   id: string;
   label: string;
   size: number;
-  startPosition: number;
+  startPosition?: number;
   vectorUrl?: string;
 }
 
@@ -16,6 +16,7 @@ interface RackContextType {
   items: RackItem[];
   addItem: (item: Omit<RackItem, "startPosition">, position?: number) => void;
   removeItem: (id: string) => void;
+  updateItems: (items: RackItem[]) => void;
 }
 
 const RackContext = createContext<RackContextType | undefined>(undefined);
@@ -30,23 +31,29 @@ export function RackProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateItems = (newItems: RackItem[]) => {
+    const itemsWithPosition = newItems.map((item) => ({
+      ...item,
+      startPosition: item.startPosition ?? slotCount,
+    }));
+    setItems(itemsWithPosition);
+  };
+
   const addItem = (
     item: Omit<RackItem, "startPosition">,
     position?: number
   ) => {
     if (position !== undefined) {
-      // Use the specified position directly
       setItems((prev) => [...prev, { ...item, startPosition: position }]);
       return;
     }
 
-    // Original behavior for when no position is specified
     let startPosition = slotCount;
     while (startPosition > 0) {
       const isSlotAvailable = !items.some(
         (existingItem) =>
-          startPosition <= existingItem.startPosition &&
-          startPosition > existingItem.startPosition - existingItem.size
+          startPosition <= (existingItem.startPosition ?? 0) &&
+          startPosition > (existingItem.startPosition ?? 0) - existingItem.size
       );
 
       if (isSlotAvailable && startPosition - item.size + 1 > 0) {
@@ -63,7 +70,14 @@ export function RackProvider({ children }: { children: ReactNode }) {
 
   return (
     <RackContext.Provider
-      value={{ slotCount, updateSlotCount, items, addItem, removeItem }}
+      value={{
+        slotCount,
+        updateSlotCount,
+        items,
+        addItem,
+        removeItem,
+        updateItems,
+      }}
     >
       {children}
     </RackContext.Provider>
