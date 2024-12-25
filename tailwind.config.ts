@@ -13,6 +13,10 @@ export default {
     },
     extend: {
       colors: {
+        rack: {
+          DEFAULT: "hsl(var(--rack-background))",
+          muted: "hsl(var(--rack-muted-background))",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
