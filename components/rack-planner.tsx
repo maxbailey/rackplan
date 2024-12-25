@@ -35,7 +35,7 @@ function Item({ item, removeItem }: ItemProps) {
       <motion.div
         className={`group relative flex flex-row items-center gap-2 w-full rounded-md p-4 select-none ${
           isBlank
-            ? "bg-neutral-100 dark:bg-neutral-900"
+            ? "bg-neutral-100 dark:bg-neutral-900 justify-center"
             : "bg-neutral-200 dark:bg-neutral-800"
         }`}
         style={{
@@ -58,20 +58,28 @@ function Item({ item, removeItem }: ItemProps) {
             }}
           />
         )}
-        <span
-          className={`text-sm font-medium relative z-10 transition-opacity ${
-            vectorUrl && !isBlank ? "opacity-0 group-hover:opacity-100" : ""
-          }`}
-        >
-          {label}
-        </span>
-        <span
-          className={`text-xs text-muted-foreground relative z-10 transition-opacity ${
-            vectorUrl && !isBlank ? "opacity-0 group-hover:opacity-100" : ""
-          }`}
-        >
-          {size}U
-        </span>
+        {isBlank ? (
+          <span className="text-sm font-medium text-neutral-400 dark:text-neutral-700">
+            Empty 1U Slot
+          </span>
+        ) : (
+          <>
+            <span
+              className={`text-sm font-medium relative z-10 transition-opacity ${
+                vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
+              }`}
+            >
+              {label}
+            </span>
+            <span
+              className={`text-xs text-muted-foreground relative z-10 transition-opacity ${
+                vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
+              }`}
+            >
+              {size}U
+            </span>
+          </>
+        )}
         {!isBlank && (
           <Button
             variant="ghost"
