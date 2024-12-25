@@ -31,6 +31,14 @@ function Item({ item, removeItem }: ItemProps) {
       dragListener={false}
       dragControls={controls}
       className="touch-none select-none"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{
+        type: "spring",
+        stiffness: 200,
+        damping: 20,
+      }}
     >
       <motion.div
         className={`group relative flex flex-row items-center gap-2 w-full rounded-md p-4 select-none ${
@@ -112,12 +120,11 @@ export default function RackPlanner() {
         values={items}
         onReorder={updateItems}
         className="flex flex-col gap-1"
+        layoutScroll
       >
-        <AnimatePresence>
-          {items.map((item) => (
-            <Item key={item.id} item={item} removeItem={removeItem} />
-          ))}
-        </AnimatePresence>
+        {items.map((item) => (
+          <Item key={item.id} item={item} removeItem={removeItem} />
+        ))}
       </Reorder.Group>
     </div>
   );
