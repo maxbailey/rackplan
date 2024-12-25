@@ -15,7 +15,7 @@ export default function Home() {
           </div>
 
           {/* Rack Plan */}
-          <div className="w-[648px] flex-shrink-0">
+          <div className="w-[680px] flex-shrink-0">
             <RackPlanner />
           </div>
 

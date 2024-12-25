@@ -31,72 +31,59 @@ function Item({ item, removeItem }: ItemProps) {
       dragListener={false}
       dragControls={controls}
       className="touch-none select-none"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{
+        type: "spring",
+        stiffness: 200,
+        damping: 20,
+      }}
     >
       <motion.div
-        className={`group relative flex flex-row items-center gap-2 w-full rounded-md p-4 select-none ${
+        className={`group relative flex flex-col items-center w-full overflow-hidden select-none rounded-md shadow-black/10 dark:shadow-lg dark:shadow-black/20 ${
           isBlank
-            ? "bg-neutral-100 dark:bg-neutral-900 justify-center"
-            : "bg-neutral-200 dark:bg-neutral-800"
+            ? "bg-neutral-100 dark:bg-rack-muted justify-center"
+            : "bg-white border shadow dark:bg-rack"
         }`}
-        style={{
-          aspectRatio: `10/${size}`,
-          ...(vectorUrl && {
-            backgroundImage: `url(${vectorUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }),
-        }}
         onPointerDown={(e: React.PointerEvent) => controls.start(e)}
       >
-        {vectorUrl && !isBlank && (
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(23,23,23,1) 0%, rgba(23,23,23,0.6) 50%, rgba(23,23,23,1) 100%)",
-            }}
-          />
-        )}
-        {isBlank ? (
-          <span className="text-sm font-medium text-neutral-400 dark:text-neutral-700">
-            Empty 1U Slot
-          </span>
-        ) : (
-          <>
-            <span
-              className={`text-sm font-medium relative z-10 transition-opacity ${
-                vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
-              }`}
-            >
-              {label}
+        <div
+          className="w-full"
+          style={{
+            aspectRatio: `10/${size}`,
+            ...(vectorUrl && {
+              backgroundImage: `url(${vectorUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }),
+          }}
+        ></div>
+        <div className="flex flex-row gap-2 justify-between p-2 w-full">
+          {isBlank ? (
+            <span className="text-sm font-medium text-neutral-400 dark:text-neutral-700">
+              Empty 1U Slot
             </span>
+          ) : (
+            <>
+              <span className="text-sm font-medium text-foreground dark:text-foreground">
+                {size}U • {label}
+              </span>
+            </>
+          )}
+          {!isBlank && (
             <span
-              className={`text-xs text-muted-foreground relative z-10 transition-opacity ${
-                vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
-              }`}
+              className="text-sm font-medium text-muted-foreground dark:text-muted-foreground cursor-pointer hover:dark:text-red-400"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeItem(id);
+              }}
             >
-              {size}U
+              Remove
             </span>
-          </>
-        )}
-        {!isBlank && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`absolute right-2 transition-opacity ${
-              vectorUrl
-                ? "opacity-0 group-hover:opacity-100"
-                : "opacity-0 group-hover:opacity-100"
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              removeItem(id);
-            }}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
+          )}
+        </div>
       </motion.div>
     </Reorder.Item>
   );
@@ -112,12 +99,11 @@ export default function RackPlanner() {
         values={items}
         onReorder={updateItems}
         className="flex flex-col gap-1"
+        layoutScroll
       >
-        <AnimatePresence>
-          {items.map((item) => (
-            <Item key={item.id} item={item} removeItem={removeItem} />
-          ))}
-        </AnimatePresence>
+        {items.map((item) => (
+          <Item key={item.id} item={item} removeItem={removeItem} />
+        ))}
       </Reorder.Group>
     </div>
   );
