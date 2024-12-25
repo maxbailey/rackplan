@@ -2,6 +2,7 @@ import BrandPanel from "@/components/brand-panel";
 import RackPlanner from "@/components/rack-planner";
 import SettingsPanel from "@/components/settings-panel";
 import { RackProvider } from "@/context/rack-context";
+import { CommandDialogDemo } from "@/components/command-dialog";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
             <SettingsPanel />
           </div>
         </div>
+        <CommandDialogDemo />
       </div>
     </RackProvider>
   );
