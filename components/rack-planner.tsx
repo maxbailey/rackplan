@@ -14,61 +14,14 @@ interface SlotProps {
     startPosition: number;
     vectorUrl?: string;
   };
-  onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-  onDragStart: (size: number) => void;
-  dragSize: number;
   removeItem: (id: string) => void;
 }
 
-function Slot({
-  position,
-  equipment,
-  onDrop,
-  onDragStart,
-  dragSize,
-  removeItem,
-}: SlotProps) {
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const slots = document.querySelectorAll(`[data-slot]`);
-    slots.forEach((slot) => {
-      const slotPosition = parseInt(slot.getAttribute("data-slot") || "0");
-      if (slotPosition <= position && slotPosition > position - dragSize) {
-        slot.classList.add("bg-neutral-300", "dark:bg-neutral-600");
-      } else {
-        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-      }
-    });
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    const relatedTarget = e.relatedTarget as HTMLElement;
-    if (!relatedTarget?.closest(".rack-planner")) {
-      const slots = document.querySelectorAll(`[data-slot]`);
-      slots.forEach((slot) => {
-        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-      });
-    }
-  };
-
+function Slot({ position, equipment, removeItem }: SlotProps) {
   if (equipment && position === equipment.startPosition) {
     return (
       <div
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.setData("text/plain", equipment.id);
-          e.currentTarget.classList.add("opacity-50");
-          onDragStart(equipment.size);
-        }}
-        onDragEnd={(e) => {
-          e.currentTarget.classList.remove("opacity-50");
-          const slots = document.querySelectorAll(`[data-slot]`);
-          slots.forEach((slot) => {
-            slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-          });
-          onDragStart(1);
-        }}
-        className="group relative flex flex-row items-center gap-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-md p-4 cursor-move transition-opacity"
+        className="group relative flex flex-row items-center gap-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-md p-4"
         style={{
           aspectRatio: `10/${equipment.size}`,
           ...(equipment.vectorUrl && {
@@ -132,83 +85,39 @@ function Slot({
   return (
     <div
       data-slot={position}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={(e) => {
-        const slots = document.querySelectorAll(`[data-slot]`);
-        slots.forEach((slot) => {
-          slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-        });
-        onDrop(e);
-      }}
       className="flex flex-row gap-2 w-full aspect-[10/1] bg-neutral-100 dark:bg-neutral-900 rounded-md transition-colors"
     />
   );
 }
 
 export default function RackPlanner() {
-  const { slotCount, items, removeItem, addItem } = useRack();
-  const [dragSize, setDragSize] = useState(1);
-
-  const handleDrop = (
-    e: React.DragEvent<HTMLDivElement>,
-    newPosition: number
-  ) => {
-    e.preventDefault();
-    const itemId = e.dataTransfer.getData("text/plain");
-    const item = items.find((i) => i.id === itemId);
-
-    if (!item) return;
-
-    if (newPosition - item.size + 1 <= 0) return;
-
-    const wouldOverlap = items.some((existingItem) => {
-      if (existingItem.id === itemId) return false;
-
-      for (let i = 0; i < item.size; i++) {
-        const checkPosition = newPosition - i;
-        if (
-          checkPosition <= existingItem.startPosition &&
-          checkPosition > existingItem.startPosition - existingItem.size
-        ) {
-          return true;
-        }
-      }
-      return false;
-    });
-
-    if (wouldOverlap) return;
-
-    removeItem(itemId);
-    addItem(
-      {
-        id: item.id,
-        label: item.label,
-        size: item.size,
-        vectorUrl: item.vectorUrl,
-      },
-      newPosition
-    );
-  };
+  const { slotCount, items, removeItem } = useRack();
 
   return (
     <div className="rack-planner flex flex-col gap-1">
       {Array.from({ length: slotCount }).map((_, index) => {
         const position = slotCount - index;
-        const equipment = items.find(
-          (item) =>
-            position <= item.startPosition &&
-            position > item.startPosition - item.size
-        );
+        const equipment = items.find((item) => {
+          const startPosition = item.startPosition ?? 0;
+          return (
+            position <= startPosition && position > startPosition - item.size
+          );
+        });
+
+        // Only pass equipment if it has a valid startPosition
+        const validEquipment =
+          equipment && equipment.startPosition !== undefined
+            ? {
+                ...equipment,
+                startPosition: equipment.startPosition,
+              }
+            : undefined;
 
         return (
           <Slot
             key={position}
             position={position}
-            equipment={equipment}
-            onDrop={(e) => handleDrop(e, position)}
-            onDragStart={setDragSize}
-            dragSize={dragSize}
+            equipment={validEquipment}
             removeItem={removeItem}
           />
         );
