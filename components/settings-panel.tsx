@@ -3,9 +3,9 @@
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRack } from "../context/rack-context";
-import { DownloadIcon, FileJson } from "lucide-react";
+import { DownloadIcon, FileJson, RotateCcw } from "lucide-react";
 
 interface EquipmentData {
   id: string;
@@ -128,9 +128,19 @@ export default function SettingsPanel() {
     return blankSlots.length >= size;
   };
 
+  const handleReset = () => {
+    const blankSlots = Array.from({ length: slotCount }, (_, i) => ({
+      id: `blank-${Date.now()}-${i}`,
+      size: 1,
+      isBlank: true,
+      label: "1U",
+    }));
+    updateItems(blankSlots);
+  };
+
   return (
-    <div className="flex flex-col gap-6 sticky top-6">
-      <div className="flex gap-3">
+    <div className="flex flex-col h-full gap-3 sticky top-6">
+      <div className="grid grid-cols-3 gap-3">
         <Button
           variant="outline"
           className="w-full"
@@ -138,7 +148,7 @@ export default function SettingsPanel() {
           disabled={items.length === 0}
         >
           <DownloadIcon className="w-4 h-4" />
-          Save JSON
+          Save
         </Button>
         <div className="relative w-full">
           <Button
@@ -147,7 +157,7 @@ export default function SettingsPanel() {
             onClick={() => document.getElementById("file-upload")?.click()}
           >
             <FileJson className="w-4 h-4" />
-            Load JSON
+            Load
           </Button>
           <input
             type="file"
@@ -157,12 +167,21 @@ export default function SettingsPanel() {
             className="hidden"
           />
         </div>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleReset}
+          disabled={items.every((item) => item.isBlank)}
+        >
+          <RotateCcw className="w-4 h-4" />
+          Reset
+        </Button>
       </div>
       <Card className="flex flex-col p-6 gap-4">
-        <h1 className="text-xl font-medium tracking-tight text-foreground">
-          Settings
-        </h1>
         <div className="flex flex-col gap-4">
+          <h1 className="text-xl font-medium tracking-tight text-foreground">
+            Settings
+          </h1>
           <form
             onSubmit={handleSubmit}
             className="flex flex-row w-full items-center justify-between"
