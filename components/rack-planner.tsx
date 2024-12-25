@@ -1,85 +1,55 @@
 "use client";
 
 import { useRack } from "../context/rack-context";
-import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
+import {
+  Reorder,
+  motion,
+  AnimatePresence,
+  useDragControls,
+} from "motion/react";
 
-interface SlotProps {
-  position: number;
-  equipment?: {
+interface ItemProps {
+  item: {
     id: string;
     label: string;
     size: number;
-    startPosition: number;
     vectorUrl?: string;
+    isBlank?: boolean;
   };
-  onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-  onDragStart: (size: number) => void;
-  dragSize: number;
   removeItem: (id: string) => void;
 }
 
-function Slot({
-  position,
-  equipment,
-  onDrop,
-  onDragStart,
-  dragSize,
-  removeItem,
-}: SlotProps) {
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const slots = document.querySelectorAll(`[data-slot]`);
-    slots.forEach((slot) => {
-      const slotPosition = parseInt(slot.getAttribute("data-slot") || "0");
-      if (slotPosition <= position && slotPosition > position - dragSize) {
-        slot.classList.add("bg-neutral-300", "dark:bg-neutral-600");
-      } else {
-        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-      }
-    });
-  };
+function Item({ item, removeItem }: ItemProps) {
+  const controls = useDragControls();
+  const { id, label, size, vectorUrl, isBlank } = item;
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    const relatedTarget = e.relatedTarget as HTMLElement;
-    if (!relatedTarget?.closest(".rack-planner")) {
-      const slots = document.querySelectorAll(`[data-slot]`);
-      slots.forEach((slot) => {
-        slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-      });
-    }
-  };
-
-  if (equipment && position === equipment.startPosition) {
-    return (
-      <div
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.setData("text/plain", equipment.id);
-          e.currentTarget.classList.add("opacity-50");
-          onDragStart(equipment.size);
-        }}
-        onDragEnd={(e) => {
-          e.currentTarget.classList.remove("opacity-50");
-          const slots = document.querySelectorAll(`[data-slot]`);
-          slots.forEach((slot) => {
-            slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-          });
-          onDragStart(1);
-        }}
-        className="group relative flex flex-row items-center gap-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-md p-4 cursor-move transition-opacity"
+  return (
+    <Reorder.Item
+      value={item}
+      dragListener={false}
+      dragControls={controls}
+      className="touch-none select-none"
+    >
+      <motion.div
+        className={`group relative flex flex-row items-center gap-2 w-full rounded-md p-4 select-none ${
+          isBlank
+            ? "bg-neutral-100 dark:bg-neutral-900 justify-center"
+            : "bg-neutral-200 dark:bg-neutral-800"
+        }`}
         style={{
-          aspectRatio: `10/${equipment.size}`,
-          ...(equipment.vectorUrl && {
-            backgroundImage: `url(${equipment.vectorUrl})`,
+          aspectRatio: `10/${size}`,
+          ...(vectorUrl && {
+            backgroundImage: `url(${vectorUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }),
         }}
+        onPointerDown={(e: React.PointerEvent) => controls.start(e)}
       >
-        {equipment.vectorUrl && (
+        {vectorUrl && !isBlank && (
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"
             style={{
@@ -88,131 +58,67 @@ function Slot({
             }}
           />
         )}
-        <span
-          className={`text-sm font-medium relative z-10 transition-opacity ${
-            equipment.vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
-          }`}
-        >
-          {equipment.label}
-        </span>
-        <span
-          className={`text-xs text-muted-foreground relative z-10 transition-opacity ${
-            equipment.vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
-          }`}
-        >
-          {equipment.size}U
-        </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`absolute right-2 transition-opacity ${
-            equipment.vectorUrl
-              ? "opacity-0 group-hover:opacity-100"
-              : "opacity-0 group-hover:opacity-100"
-          }`}
-          onClick={(e) => {
-            e.stopPropagation();
-            removeItem(equipment.id);
-          }}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
-
-  if (
-    equipment &&
-    position < equipment.startPosition &&
-    position > equipment.startPosition - equipment.size
-  ) {
-    return null;
-  }
-
-  return (
-    <div
-      data-slot={position}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={(e) => {
-        const slots = document.querySelectorAll(`[data-slot]`);
-        slots.forEach((slot) => {
-          slot.classList.remove("bg-neutral-300", "dark:bg-neutral-600");
-        });
-        onDrop(e);
-      }}
-      className="flex flex-row gap-2 w-full aspect-[10/1] bg-neutral-100 dark:bg-neutral-900 rounded-md transition-colors"
-    />
+        {isBlank ? (
+          <span className="text-sm font-medium text-neutral-400 dark:text-neutral-700">
+            Empty 1U Slot
+          </span>
+        ) : (
+          <>
+            <span
+              className={`text-sm font-medium relative z-10 transition-opacity ${
+                vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
+              }`}
+            >
+              {label}
+            </span>
+            <span
+              className={`text-xs text-muted-foreground relative z-10 transition-opacity ${
+                vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
+              }`}
+            >
+              {size}U
+            </span>
+          </>
+        )}
+        {!isBlank && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`absolute right-2 transition-opacity ${
+              vectorUrl
+                ? "opacity-0 group-hover:opacity-100"
+                : "opacity-0 group-hover:opacity-100"
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              removeItem(id);
+            }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+      </motion.div>
+    </Reorder.Item>
   );
 }
 
 export default function RackPlanner() {
-  const { slotCount, items, removeItem, addItem } = useRack();
-  const [dragSize, setDragSize] = useState(1);
-
-  const handleDrop = (
-    e: React.DragEvent<HTMLDivElement>,
-    newPosition: number
-  ) => {
-    e.preventDefault();
-    const itemId = e.dataTransfer.getData("text/plain");
-    const item = items.find((i) => i.id === itemId);
-
-    if (!item) return;
-
-    if (newPosition - item.size + 1 <= 0) return;
-
-    const wouldOverlap = items.some((existingItem) => {
-      if (existingItem.id === itemId) return false;
-
-      for (let i = 0; i < item.size; i++) {
-        const checkPosition = newPosition - i;
-        if (
-          checkPosition <= existingItem.startPosition &&
-          checkPosition > existingItem.startPosition - existingItem.size
-        ) {
-          return true;
-        }
-      }
-      return false;
-    });
-
-    if (wouldOverlap) return;
-
-    removeItem(itemId);
-    addItem(
-      {
-        id: item.id,
-        label: item.label,
-        size: item.size,
-        vectorUrl: item.vectorUrl,
-      },
-      newPosition
-    );
-  };
+  const { items, updateItems, removeItem } = useRack();
 
   return (
     <div className="rack-planner flex flex-col gap-1">
-      {Array.from({ length: slotCount }).map((_, index) => {
-        const position = slotCount - index;
-        const equipment = items.find(
-          (item) =>
-            position <= item.startPosition &&
-            position > item.startPosition - item.size
-        );
-
-        return (
-          <Slot
-            key={position}
-            position={position}
-            equipment={equipment}
-            onDrop={(e) => handleDrop(e, position)}
-            onDragStart={setDragSize}
-            dragSize={dragSize}
-            removeItem={removeItem}
-          />
-        );
-      })}
+      <Reorder.Group
+        axis="y"
+        values={items}
+        onReorder={updateItems}
+        className="flex flex-col gap-1"
+      >
+        <AnimatePresence>
+          {items.map((item) => (
+            <Item key={item.id} item={item} removeItem={removeItem} />
+          ))}
+        </AnimatePresence>
+      </Reorder.Group>
     </div>
   );
 }
