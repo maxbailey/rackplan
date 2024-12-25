@@ -23,7 +23,7 @@ export function CommandDialogDemo() {
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="sr-only">Command Menu</DialogTitle>
-      <CommandMenu />
+      <CommandMenu setOpen={setOpen} />
     </CommandDialog>
   );
 }

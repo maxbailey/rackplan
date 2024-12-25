@@ -141,15 +141,6 @@ export default function SettingsPanel() {
   return (
     <div className="flex flex-col h-full gap-3 sticky top-6">
       <div className="grid grid-cols-3 gap-3">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleSave}
-          disabled={items.length === 0}
-        >
-          <DownloadIcon className="w-4 h-4" />
-          Save
-        </Button>
         <div className="relative w-full">
           <Button
             variant="outline"
@@ -167,6 +158,15 @@ export default function SettingsPanel() {
             className="hidden"
           />
         </div>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleSave}
+          disabled={items.every((item) => item.isBlank)}
+        >
+          <DownloadIcon className="w-4 h-4" />
+          Save
+        </Button>
         <Button
           variant="outline"
           className="w-full"
