@@ -24,8 +24,8 @@ interface RackState {
     id: string;
     label: string;
     size: number;
-    startPosition?: number;
     vectorUrl?: string;
+    isBlank?: boolean;
   }[];
 }
 
@@ -35,6 +35,11 @@ export default function SettingsPanel() {
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const usedSlots = items.reduce(
+    (acc, item) => acc + (item.isBlank ? 0 : item.size),
+    0
+  );
+
   const handleSave = () => {
     const state: RackState = {
       slotCount,
@@ -42,8 +47,8 @@ export default function SettingsPanel() {
         id: item.id,
         label: item.label,
         size: item.size,
-        startPosition: item.startPosition,
         vectorUrl: item.vectorUrl,
+        isBlank: item.isBlank,
       })),
     };
 
@@ -119,32 +124,8 @@ export default function SettingsPanel() {
   };
 
   const canFitEquipment = (size: number) => {
-    for (let position = slotCount; position > 0; position--) {
-      let isFree = true;
-      for (let offset = 0; offset < size; offset++) {
-        const checkPosition = position - offset;
-        if (checkPosition <= 0) {
-          isFree = false;
-          break;
-        }
-
-        const isOccupied = items.some(
-          (item) =>
-            checkPosition <= (item.startPosition ?? 0) &&
-            checkPosition > (item.startPosition ?? 0) - item.size
-        );
-
-        if (isOccupied) {
-          isFree = false;
-          break;
-        }
-      }
-
-      if (isFree) {
-        return true;
-      }
-    }
-    return false;
+    const blankSlots = items.filter((item) => item.isBlank);
+    return blankSlots.length >= size;
   };
 
   return (
@@ -181,27 +162,35 @@ export default function SettingsPanel() {
         <h1 className="text-xl font-medium tracking-tight text-foreground">
           Settings
         </h1>
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-row w-full items-center justify-between"
-        >
-          <span className="text-sm text-muted-foreground">
-            Rack Size (units)
-          </span>
-          <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              min={1}
-              max={50}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              className="w-16 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
-            <Button variant="outline" type="submit">
-              Update
-            </Button>
+        <div className="flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-row w-full items-center justify-between"
+          >
+            <span className="text-sm text-muted-foreground">
+              Rack Size (units)
+            </span>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min={1}
+                max={50}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="w-16 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <Button variant="outline" type="submit">
+                Update
+              </Button>
+            </div>
+          </form>
+          <div className="flex flex-row w-full items-center justify-between">
+            <span className="text-sm text-muted-foreground">Used Space</span>
+            <span className="text-sm font-medium">
+              {usedSlots} / {slotCount} U
+            </span>
           </div>
-        </form>
+        </div>
       </Card>
       <Card className="flex flex-col p-6 gap-3">
         <h1 className="text-xl font-medium tracking-tight text-foreground">

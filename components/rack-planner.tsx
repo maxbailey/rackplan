@@ -1,38 +1,55 @@
 "use client";
 
 import { useRack } from "../context/rack-context";
-import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
+import {
+  Reorder,
+  motion,
+  AnimatePresence,
+  useDragControls,
+} from "motion/react";
 
-interface SlotProps {
-  position: number;
-  equipment?: {
+interface ItemProps {
+  item: {
     id: string;
     label: string;
     size: number;
-    startPosition: number;
     vectorUrl?: string;
+    isBlank?: boolean;
   };
   removeItem: (id: string) => void;
 }
 
-function Slot({ position, equipment, removeItem }: SlotProps) {
-  if (equipment && position === equipment.startPosition) {
-    return (
-      <div
-        className="group relative flex flex-row items-center gap-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-md p-4"
+function Item({ item, removeItem }: ItemProps) {
+  const controls = useDragControls();
+  const { id, label, size, vectorUrl, isBlank } = item;
+
+  return (
+    <Reorder.Item
+      value={item}
+      dragListener={false}
+      dragControls={controls}
+      className="touch-none select-none"
+    >
+      <motion.div
+        className={`group relative flex flex-row items-center gap-2 w-full rounded-md p-4 select-none ${
+          isBlank
+            ? "bg-neutral-100 dark:bg-neutral-900"
+            : "bg-neutral-200 dark:bg-neutral-800"
+        }`}
         style={{
-          aspectRatio: `10/${equipment.size}`,
-          ...(equipment.vectorUrl && {
-            backgroundImage: `url(${equipment.vectorUrl})`,
+          aspectRatio: `10/${size}`,
+          ...(vectorUrl && {
+            backgroundImage: `url(${vectorUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }),
         }}
+        onPointerDown={(e: React.PointerEvent) => controls.start(e)}
       >
-        {equipment.vectorUrl && (
+        {vectorUrl && !isBlank && (
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"
             style={{
@@ -43,85 +60,57 @@ function Slot({ position, equipment, removeItem }: SlotProps) {
         )}
         <span
           className={`text-sm font-medium relative z-10 transition-opacity ${
-            equipment.vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
+            vectorUrl && !isBlank ? "opacity-0 group-hover:opacity-100" : ""
           }`}
         >
-          {equipment.label}
+          {label}
         </span>
         <span
           className={`text-xs text-muted-foreground relative z-10 transition-opacity ${
-            equipment.vectorUrl ? "opacity-0 group-hover:opacity-100" : ""
+            vectorUrl && !isBlank ? "opacity-0 group-hover:opacity-100" : ""
           }`}
         >
-          {equipment.size}U
+          {size}U
         </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`absolute right-2 transition-opacity ${
-            equipment.vectorUrl
-              ? "opacity-0 group-hover:opacity-100"
-              : "opacity-0 group-hover:opacity-100"
-          }`}
-          onClick={(e) => {
-            e.stopPropagation();
-            removeItem(equipment.id);
-          }}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
-
-  if (
-    equipment &&
-    position < equipment.startPosition &&
-    position > equipment.startPosition - equipment.size
-  ) {
-    return null;
-  }
-
-  return (
-    <div
-      data-slot={position}
-      className="flex flex-row gap-2 w-full aspect-[10/1] bg-neutral-100 dark:bg-neutral-900 rounded-md transition-colors"
-    />
+        {!isBlank && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`absolute right-2 transition-opacity ${
+              vectorUrl
+                ? "opacity-0 group-hover:opacity-100"
+                : "opacity-0 group-hover:opacity-100"
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              removeItem(id);
+            }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+      </motion.div>
+    </Reorder.Item>
   );
 }
 
 export default function RackPlanner() {
-  const { slotCount, items, removeItem } = useRack();
+  const { items, updateItems, removeItem } = useRack();
 
   return (
     <div className="rack-planner flex flex-col gap-1">
-      {Array.from({ length: slotCount }).map((_, index) => {
-        const position = slotCount - index;
-        const equipment = items.find((item) => {
-          const startPosition = item.startPosition ?? 0;
-          return (
-            position <= startPosition && position > startPosition - item.size
-          );
-        });
-
-        // Only pass equipment if it has a valid startPosition
-        const validEquipment =
-          equipment && equipment.startPosition !== undefined
-            ? {
-                ...equipment,
-                startPosition: equipment.startPosition,
-              }
-            : undefined;
-
-        return (
-          <Slot
-            key={position}
-            position={position}
-            equipment={validEquipment}
-            removeItem={removeItem}
-          />
-        );
-      })}
+      <Reorder.Group
+        axis="y"
+        values={items}
+        onReorder={updateItems}
+        className="flex flex-col gap-1"
+      >
+        <AnimatePresence>
+          {items.map((item) => (
+            <Item key={item.id} item={item} removeItem={removeItem} />
+          ))}
+        </AnimatePresence>
+      </Reorder.Group>
     </div>
   );
 }

@@ -6,66 +6,81 @@ interface RackItem {
   id: string;
   label: string;
   size: number;
-  startPosition?: number;
   vectorUrl?: string;
+  isBlank?: boolean;
 }
 
 interface RackContextType {
   slotCount: number;
   updateSlotCount: (size: number) => void;
   items: RackItem[];
-  addItem: (item: Omit<RackItem, "startPosition">, position?: number) => void;
+  addItem: (item: Omit<RackItem, "isBlank">) => void;
   removeItem: (id: string) => void;
   updateItems: (items: RackItem[]) => void;
 }
 
 const RackContext = createContext<RackContextType | undefined>(undefined);
 
+function createBlankSlots(count: number): RackItem[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `blank-${Date.now()}-${i}`,
+    size: 1,
+    isBlank: true,
+    label: "1U",
+  }));
+}
+
 export function RackProvider({ children }: { children: ReactNode }) {
   const [slotCount, setSlotCount] = useState<number>(12);
-  const [items, setItems] = useState<RackItem[]>([]);
+  const [items, setItems] = useState<RackItem[]>(createBlankSlots(12));
 
   const updateSlotCount = (size: number) => {
     if (size >= 1 && size <= 50) {
       setSlotCount(size);
+      const nonBlankItems = items.filter((item) => !item.isBlank);
+      const usedSlots = nonBlankItems.reduce((acc, item) => acc + item.size, 0);
+      const neededBlankSlots = Math.max(0, size - usedSlots);
+
+      setItems([...nonBlankItems, ...createBlankSlots(neededBlankSlots)]);
     }
   };
 
   const updateItems = (newItems: RackItem[]) => {
-    const itemsWithPosition = newItems.map((item) => ({
-      ...item,
-      startPosition: item.startPosition ?? slotCount,
-    }));
-    setItems(itemsWithPosition);
+    setItems(newItems);
   };
 
-  const addItem = (
-    item: Omit<RackItem, "startPosition">,
-    position?: number
-  ) => {
-    if (position !== undefined) {
-      setItems((prev) => [...prev, { ...item, startPosition: position }]);
-      return;
-    }
+  const addItem = (item: Omit<RackItem, "isBlank">) => {
+    const newItem = { ...item, isBlank: false };
 
-    let startPosition = slotCount;
-    while (startPosition > 0) {
-      const isSlotAvailable = !items.some(
-        (existingItem) =>
-          startPosition <= (existingItem.startPosition ?? 0) &&
-          startPosition > (existingItem.startPosition ?? 0) - existingItem.size
-      );
+    let consecutiveBlankCount = 0;
+    let startIndex = -1;
 
-      if (isSlotAvailable && startPosition - item.size + 1 > 0) {
-        setItems((prev) => [...prev, { ...item, startPosition }]);
-        break;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].isBlank) {
+        if (startIndex === -1) startIndex = i;
+        consecutiveBlankCount++;
+        if (consecutiveBlankCount === newItem.size) break;
+      } else {
+        consecutiveBlankCount = 0;
+        startIndex = -1;
       }
-      startPosition--;
     }
+
+    if (consecutiveBlankCount < newItem.size) return;
+
+    const newItems = [...items];
+    newItems.splice(startIndex, newItem.size, newItem);
+    setItems(newItems);
   };
 
   const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    const itemToRemove = items.find((item) => item.id === id);
+    if (!itemToRemove || itemToRemove.isBlank) return;
+
+    setItems((prev) => {
+      const newItems = prev.filter((item) => item.id !== id);
+      return [...newItems, ...createBlankSlots(itemToRemove.size)];
+    });
   };
 
   return (
