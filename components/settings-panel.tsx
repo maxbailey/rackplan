@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
+import { Badge } from "./ui/badge";
 import { useState, useEffect } from "react";
 import { useRack } from "../context/rack-context";
 import { DownloadIcon, FileJson, RotateCcw, ImageIcon } from "lucide-react";
@@ -39,6 +40,8 @@ export default function SettingsPanel() {
   const { slotCount, updateSlotCount, addItem, items, updateItems } = useRack();
   const [inputValue, setInputValue] = useState<string>(slotCount.toString());
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -101,7 +104,8 @@ export default function SettingsPanel() {
         const response = await fetch("/api/equipment");
         if (!response.ok) throw new Error("Failed to fetch equipment");
         const data = await response.json();
-        setEquipment(data);
+        setEquipment(data.equipment);
+        setAllTags(data.tags);
       } catch (error) {
         console.error("Error fetching equipment:", error);
       } finally {
@@ -148,6 +152,10 @@ export default function SettingsPanel() {
   };
 
   const filteredEquipment = equipment.filter((item) => {
+    if (selectedTag && (!item.tags || !item.tags.includes(selectedTag))) {
+      return false;
+    }
+
     if (!searchQuery) return true;
 
     const query = searchQuery.toLowerCase();
@@ -408,6 +416,24 @@ export default function SettingsPanel() {
             </kbd>
           </div>
         </div>
+
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 p-3 border-b">
+            {allTags.map((tag) => (
+              <Badge
+                key={tag}
+                variant={selectedTag === tag ? "default" : "secondary"}
+                className={`cursor-pointer hover:opacity-80 ${
+                  selectedTag === tag ? "" : "bg-muted hover:bg-muted"
+                }`}
+                onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center w-full p-6">
             <Image
@@ -444,7 +470,7 @@ export default function SettingsPanel() {
                         <span className="text-xs text-muted-foreground">
                           {item.size}U
                           {item.tags?.length
-                            ? ` • ${item.tags.join(", ")}`
+                            ? ` - ${item.tags.join(", ")}`
                             : ""}
                         </span>
                       </div>

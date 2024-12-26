@@ -79,12 +79,18 @@ export async function GET() {
 
     const validEquipment = equipmentData.filter((item) => item !== null);
 
-    // Sort by label a-z
     const sortedEquipment = validEquipment.sort((a, b) =>
       (a.label ?? "").localeCompare(b.label ?? "")
     );
 
-    return NextResponse.json(sortedEquipment);
+    const allTags = Array.from(
+      new Set(sortedEquipment.flatMap((item) => item.tags || []))
+    ).sort();
+
+    return NextResponse.json({
+      equipment: sortedEquipment,
+      tags: allTags,
+    });
   } catch (error) {
     console.error("Error fetching equipment data:", error);
     return NextResponse.json(
