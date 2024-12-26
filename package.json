@@ -1,5 +1,6 @@
 {
   "name": "rackplan",
+  "node": "18.20.4",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.1.1",
