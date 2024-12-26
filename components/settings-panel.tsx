@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { useState, useEffect } from "react";
 import { useRack } from "../context/rack-context";
 import { DownloadIcon, FileJson, RotateCcw } from "lucide-react";
+import Image from "next/image";
 
 interface EquipmentData {
   id: string;
@@ -217,7 +218,12 @@ export default function SettingsPanel() {
         </h1>
         {loading ? (
           <div className="flex items-center justify-center w-full">
-            <img src="/loading-ring.svg" alt="Loading" />
+            <Image
+              src="/loading-ring.svg"
+              alt="Loading"
+              width={40}
+              height={40}
+            />
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -231,10 +237,12 @@ export default function SettingsPanel() {
                   className="flex flex-row items-center justify-between py-2"
                 >
                   <div className="flex flex-row items-center gap-3">
-                    <img
+                    <Image
                       src={item.logoUrl || "/rp-avatar.svg"}
                       alt={`${item.label} logo`}
-                      className="w-8 h-8 object-contain rounded-full"
+                      width={32}
+                      height={32}
+                      className="object-contain rounded-full"
                     />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{item.label}</span>

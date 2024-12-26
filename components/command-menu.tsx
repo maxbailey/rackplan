@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  DownloadIcon,
-  FileJson,
-  RotateCcw,
-  Search,
-  Package,
-} from "lucide-react";
+import { DownloadIcon, FileJson, RotateCcw, Package } from "lucide-react";
 
 import {
   Command,
@@ -16,7 +10,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 import { useRack } from "@/context/rack-context";
 

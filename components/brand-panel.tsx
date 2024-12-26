@@ -40,9 +40,12 @@ export default function BrandPanel() {
               </Button>
             )}
             <a href="https://github.com/maxbailey/rackplan" target="_blank">
-              <img
+              <Image
                 alt="GitHub Repo stars"
                 src="https://img.shields.io/github/stars/maxbailey/rackplan"
+                width={90}
+                height={20}
+                unoptimized
               />
             </a>
           </div>
