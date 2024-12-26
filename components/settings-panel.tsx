@@ -30,6 +30,7 @@ interface RackState {
     size: number;
     vectorUrl?: string;
     isBlank?: boolean;
+    link?: string;
   }[];
 }
 
@@ -54,6 +55,7 @@ export default function SettingsPanel() {
         size: item.size,
         vectorUrl: item.vectorUrl,
         isBlank: item.isBlank,
+        link: item.link,
       })),
     };
 
@@ -125,6 +127,7 @@ export default function SettingsPanel() {
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
       vectorUrl: equipmentItem.vectorUrl,
+      link: equipmentItem.link,
     });
   };
 

@@ -8,6 +8,7 @@ interface RackItem {
   size: number;
   vectorUrl?: string;
   isBlank?: boolean;
+  link?: string;
 }
 
 interface RackContextType {
