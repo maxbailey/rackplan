@@ -1,7 +1,8 @@
 {
-  "label": "Ubiquiti Mission Critical",
+  "label": "Ubiquiti Switch Mission Critical",
   "manufacturer": "Ubiquiti",
-  "model": "Mission Critical",
+  "model": "Switch Mission Critical",
   "size": 1,
-  "link": "https://amzn.to/3P9Uiuq"
+  "link": "https://amzn.to/3P9Uiuq",
+  "tags": ["Switch"]
 }

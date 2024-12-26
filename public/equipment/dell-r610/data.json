@@ -2,5 +2,6 @@
   "label": "Dell R610",
   "manufacturer": "Dell",
   "model": "R610",
-  "size": 1
+  "size": 1,
+  "tags": ["Server"]
 }

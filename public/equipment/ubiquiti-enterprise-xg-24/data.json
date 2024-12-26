@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "Enterprise XG 24",
   "size": 1,
-  "link": "https://amzn.to/4gOqNKz"
+  "link": "https://amzn.to/4gOqNKz",
+  "tags": ["Network Switch"]
 }

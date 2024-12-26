@@ -2,5 +2,6 @@
   "label": "Custom",
   "manufacturer": "Rack Plan",
   "model": "Custom",
-  "size": 4
+  "size": 4,
+  "tags": ["Custom"]
 }

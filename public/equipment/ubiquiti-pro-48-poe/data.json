@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "Pro 48 PoE",
   "size": 1,
-  "link": "https://amzn.to/3DxwZIr"
+  "link": "https://amzn.to/3DxwZIr",
+  "tags": ["Network Switch"]
 }

@@ -2,5 +2,6 @@
   "label": "Ubiquiti Enterprise Network Video Recorder",
   "manufacturer": "Ubiquiti",
   "model": "Enterprise Network Video Recorder",
-  "size": 3
+  "size": 3,
+  "tags": ["NVR"]
 }

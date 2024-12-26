@@ -2,5 +2,6 @@
   "label": "Ubiquiti Power Backup",
   "manufacturer": "Ubiquiti",
   "model": "Power Backup",
-  "size": 1
+  "size": 1,
+  "tags": ["UPS"]
 }

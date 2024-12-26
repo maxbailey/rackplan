@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "UACC 24 Keystone Patch Panel",
   "size": 1,
-  "link": "https://amzn.to/4gId6gk"
+  "link": "https://amzn.to/4gId6gk",
+  "tags": ["Patch Panel"]
 }
