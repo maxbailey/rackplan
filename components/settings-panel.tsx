@@ -17,6 +17,7 @@ interface EquipmentData {
   color: string;
   logoUrl?: string;
   vectorUrl?: string;
+  avatarUrl?: string;
 }
 
 interface RackState {
@@ -234,11 +235,11 @@ export default function SettingsPanel() {
               return (
                 <div
                   key={item.id}
-                  className="flex flex-row items-center justify-between py-2"
+                  className="flex flex-row gap-2 items-center justify-between py-2"
                 >
                   <div className="flex flex-row items-center gap-3">
                     <Image
-                      src={item.logoUrl || "/rp-avatar.svg"}
+                      src={item.avatarUrl || item.logoUrl || "/rp-avatar.svg"}
                       alt={`${item.label} logo`}
                       width={32}
                       height={32}

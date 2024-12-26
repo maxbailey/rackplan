@@ -9,7 +9,7 @@ export async function GET() {
 
     const equipmentData = await Promise.all(
       directories
-        .filter((dirent) => dirent.isDirectory())
+        .filter((dirent) => dirent.isDirectory() && dirent.name !== "avatars")
         .map(async (dirent) => {
           const dataPath = path.join(equipmentDir, dirent.name, "data.json");
           const logoPath = path.join(equipmentDir, dirent.name, "logo.png");
@@ -34,11 +34,25 @@ export async function GET() {
               // skip
             }
 
+            let avatarUrl = undefined;
+            try {
+              const avatarPath = path.join(
+                equipmentDir,
+                "avatars",
+                `${data.manufacturer.toLowerCase()}.png`
+              );
+              await fs.access(avatarPath);
+              avatarUrl = `/equipment/avatars/${data.manufacturer.toLowerCase()}.png`;
+            } catch {
+              // skip
+            }
+
             return {
               id: dirent.name,
               ...data,
               ...(vectorUrl && { vectorUrl }),
               ...(logoUrl && { logoUrl }),
+              ...(avatarUrl && { avatarUrl }),
             };
           } catch (error) {
             console.error(`Error reading ${dataPath}:`, error);
