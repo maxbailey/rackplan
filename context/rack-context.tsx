@@ -32,8 +32,8 @@ function createBlankSlots(count: number): RackItem[] {
 }
 
 export function RackProvider({ children }: { children: ReactNode }) {
-  const [slotCount, setSlotCount] = useState<number>(12);
-  const [items, setItems] = useState<RackItem[]>(createBlankSlots(12));
+  const [slotCount, setSlotCount] = useState<number>(8);
+  const [items, setItems] = useState<RackItem[]>(createBlankSlots(8));
 
   const updateSlotCount = (size: number) => {
     if (size >= 1 && size <= 50) {
