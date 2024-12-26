@@ -3,6 +3,7 @@
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
+import { ScrollArea } from "./ui/scroll-area";
 import { useState, useEffect } from "react";
 import { useRack } from "../context/rack-context";
 import { DownloadIcon, FileJson, RotateCcw } from "lucide-react";
@@ -37,6 +38,7 @@ export default function SettingsPanel() {
   const [inputValue, setInputValue] = useState<string>(slotCount.toString());
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const usedSlots = items.reduce(
     (acc, item) => acc + (item.isBlank ? 0 : item.size),
@@ -123,7 +125,6 @@ export default function SettingsPanel() {
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
       vectorUrl: equipmentItem.vectorUrl,
-      link: equipmentItem.link,
     });
   };
 
@@ -141,6 +142,10 @@ export default function SettingsPanel() {
     }));
     updateItems(blankSlots);
   };
+
+  const filteredEquipment = equipment.filter((item) =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col h-full gap-3 sticky top-6">
@@ -215,12 +220,23 @@ export default function SettingsPanel() {
           </div>
         </div>
       </Card>
-      <Card className="flex flex-col p-6 gap-3">
-        <h1 className="text-xl font-medium tracking-tight text-foreground">
-          Insert Equipment
-        </h1>
+      <div className="relative">
+        <Input
+          className="pe-11"
+          placeholder="Search equipment..."
+          type="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-muted-foreground">
+          <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </div>
+      </div>
+      <Card className="flex flex-col">
         {loading ? (
-          <div className="flex items-center justify-center w-full">
+          <div className="flex items-center justify-center w-full p-6">
             <Image
               src="/loading-ring.svg"
               alt="Loading"
@@ -229,43 +245,47 @@ export default function SettingsPanel() {
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {equipment.map((item) => {
-              const size = parseInt(item.size);
-              const canFit = canFitEquipment(size);
+          <ScrollArea className="h-[360px]">
+            <div className="px-6 py-4">
+              {filteredEquipment.map((item) => {
+                const size = parseInt(item.size);
+                const canFit = canFitEquipment(size);
 
-              return (
-                <div
-                  key={item.id}
-                  className="flex flex-row gap-2 items-center justify-between py-2"
-                >
-                  <div className="flex flex-row items-center gap-3">
-                    <Image
-                      src={item.avatarUrl || item.logoUrl || "/rp-avatar.svg"}
-                      alt={`${item.label} logo`}
-                      width={32}
-                      height={32}
-                      className="object-contain rounded-full"
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {item.size}U
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleInsert(item)}
-                    disabled={!canFit}
+                return (
+                  <div
+                    key={item.id}
+                    className="flex flex-row gap-2 items-center justify-between py-2"
                   >
-                    {canFit ? "Insert" : "No Space"}
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+                    <div className="flex flex-row items-center gap-3">
+                      <Image
+                        src={item.avatarUrl || item.logoUrl || "/rp-avatar.svg"}
+                        alt={`${item.label} logo`}
+                        width={32}
+                        height={32}
+                        className="object-contain rounded-full"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {item.label}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {item.size}U
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleInsert(item)}
+                      disabled={!canFit}
+                    >
+                      {canFit ? "Insert" : "No Space"}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
         )}
       </Card>
     </div>
