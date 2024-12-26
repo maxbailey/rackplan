@@ -17,7 +17,7 @@ interface EquipmentData {
   size: string;
   color: string;
   logoUrl?: string;
-  vectorUrl?: string;
+  imageUrl?: string;
   avatarUrl?: string;
   link?: string;
 }
@@ -28,7 +28,7 @@ interface RackState {
     id: string;
     label: string;
     size: number;
-    vectorUrl?: string;
+    imageUrl?: string;
     isBlank?: boolean;
     link?: string;
   }[];
@@ -53,7 +53,7 @@ export default function SettingsPanel() {
         id: item.id,
         label: item.label,
         size: item.size,
-        vectorUrl: item.vectorUrl,
+        imageUrl: item.imageUrl,
         isBlank: item.isBlank,
         link: item.link,
       })),
@@ -126,7 +126,7 @@ export default function SettingsPanel() {
       id: `${equipmentItem.id}-${Date.now()}`,
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
-      vectorUrl: equipmentItem.vectorUrl,
+      imageUrl: equipmentItem.imageUrl,
       link: equipmentItem.link,
     });
   };
@@ -151,7 +151,7 @@ export default function SettingsPanel() {
   );
 
   return (
-    <div className="flex flex-col h-full gap-3 sticky top-6">
+    <div className="flex flex-col gap-3 sticky top-6">
       <div className="grid grid-cols-3 gap-3">
         <div className="relative w-full">
           <Button

@@ -10,7 +10,7 @@ interface ItemProps {
     id: string;
     label: string;
     size: number;
-    vectorUrl?: string;
+    imageUrl?: string;
     isBlank?: boolean;
     link?: string;
   };
@@ -19,7 +19,7 @@ interface ItemProps {
 
 function Item({ item, removeItem }: ItemProps) {
   const controls = useDragControls();
-  const { id, label, size, vectorUrl, isBlank, link } = item;
+  const { id, label, size, imageUrl, isBlank, link } = item;
 
   return (
     <Reorder.Item
@@ -85,8 +85,8 @@ function Item({ item, removeItem }: ItemProps) {
           className="w-full"
           style={{
             aspectRatio: `10/${size}`,
-            ...(vectorUrl && {
-              backgroundImage: `url(${vectorUrl})`,
+            ...(imageUrl && {
+              backgroundImage: `url(${imageUrl})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
