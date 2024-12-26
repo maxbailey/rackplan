@@ -189,6 +189,65 @@ export default function SettingsPanel() {
         });
       };
 
+      const drawLabelOverlay = (
+        ctx: CanvasRenderingContext2D,
+        text: string,
+        y: number
+      ) => {
+        ctx.font = "16px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+
+        const textWidth = ctx.measureText(text).width;
+        const padding = 8;
+        const horizontalPadding = 12;
+        const labelX = 8;
+        const labelY = y + 8;
+        const backgroundHeight = 32;
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+        const radius = 8;
+        const x = labelX - horizontalPadding / 2;
+        const width = textWidth + horizontalPadding;
+        const height = backgroundHeight;
+
+        ctx.beginPath();
+        ctx.moveTo(x + radius, labelY - padding / 2);
+        ctx.lineTo(x + width - radius, labelY - padding / 2);
+        ctx.quadraticCurveTo(
+          x + width,
+          labelY - padding / 2,
+          x + width,
+          labelY - padding / 2 + radius
+        );
+        ctx.lineTo(x + width, labelY - padding / 2 + height - radius);
+        ctx.quadraticCurveTo(
+          x + width,
+          labelY - padding / 2 + height,
+          x + width - radius,
+          labelY - padding / 2 + height
+        );
+        ctx.lineTo(x + radius, labelY - padding / 2 + height);
+        ctx.quadraticCurveTo(
+          x,
+          labelY - padding / 2 + height,
+          x,
+          labelY - padding / 2 + height - radius
+        );
+        ctx.lineTo(x, labelY - padding / 2 + radius);
+        ctx.quadraticCurveTo(
+          x,
+          labelY - padding / 2,
+          x + radius,
+          labelY - padding / 2
+        );
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(text, labelX, labelY + 4);
+      };
+
       let currentY = 0;
       for (const item of items) {
         const slotHeight =
@@ -197,44 +256,21 @@ export default function SettingsPanel() {
         if (item.isBlank) {
           ctx.fillStyle = "#121212";
           ctx.fillRect(0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
-          ctx.font = "24px system-ui, -apple-system, sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-          ctx.fillText(
-            "Empty",
-            CANVAS_WIDTH / (2 * SCALE),
-            currentY + slotHeight / 2
-          );
+          drawLabelOverlay(ctx, "1U - Empty", currentY);
         } else if (item.imageUrl) {
           const img = await loadImage(item.imageUrl);
           if (img) {
             ctx.drawImage(img, 0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
+            drawLabelOverlay(ctx, `${item.size}U - ${item.label}`, currentY);
           } else {
             ctx.fillStyle = "#222222";
             ctx.fillRect(0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
-            ctx.font = "24px system-ui, -apple-system, sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "#ffffff";
-            ctx.fillText(
-              `${item.size}U - ${item.label}`,
-              CANVAS_WIDTH / (2 * SCALE),
-              currentY + slotHeight / 2
-            );
+            drawLabelOverlay(ctx, `${item.size}U - ${item.label}`, currentY);
           }
         } else {
           ctx.fillStyle = "#222222";
           ctx.fillRect(0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
-          ctx.font = "24px system-ui, -apple-system, sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "#ffffff";
-          ctx.fillText(
-            `${item.size}U - ${item.label}`,
-            CANVAS_WIDTH / (2 * SCALE),
-            currentY + slotHeight / 2
-          );
+          drawLabelOverlay(ctx, `${item.size}U - ${item.label}`, currentY);
         }
 
         currentY += slotHeight + SPACING / SCALE;
