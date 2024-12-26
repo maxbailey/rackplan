@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { useState, useEffect } from "react";
 import { useRack } from "../context/rack-context";
-import { DownloadIcon, FileJson, RotateCcw } from "lucide-react";
+import { DownloadIcon, FileJson, RotateCcw, ImageIcon } from "lucide-react";
 import Image from "next/image";
 
 interface EquipmentData {
@@ -150,9 +150,127 @@ export default function SettingsPanel() {
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleSaveImage = async () => {
+    const rackPlanner = document.querySelector(".rack-planner");
+    if (!rackPlanner) return;
+
+    try {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      if (!ctx) throw new Error("Could not get canvas context");
+
+      const SCALE = 2;
+      const CANVAS_WIDTH = 800 * SCALE;
+      const BASE_HEIGHT = 80 * SCALE;
+      const SPACING = 10 * SCALE;
+      const BANNER_HEIGHT = 80 * SCALE;
+
+      const totalHeight =
+        items.reduce((acc, item) => {
+          const slotHeight = BASE_HEIGHT * (item.isBlank ? 1 : item.size);
+          return acc + slotHeight + SPACING;
+        }, 0) + BANNER_HEIGHT;
+
+      canvas.width = CANVAS_WIDTH;
+      canvas.height = totalHeight;
+
+      ctx.scale(SCALE, SCALE);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const loadImage = (url?: string): Promise<HTMLImageElement | null> => {
+        if (!url) return Promise.resolve(null);
+        return new Promise((resolve) => {
+          const img = new window.Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+      let currentY = 0;
+      for (const item of items) {
+        const slotHeight =
+          (BASE_HEIGHT * (item.isBlank ? 1 : item.size)) / SCALE;
+
+        if (item.isBlank) {
+          ctx.fillStyle = "#121212";
+          ctx.fillRect(0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
+          ctx.font = "24px system-ui, -apple-system, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+          ctx.fillText(
+            "Empty",
+            CANVAS_WIDTH / (2 * SCALE),
+            currentY + slotHeight / 2
+          );
+        } else if (item.imageUrl) {
+          const img = await loadImage(item.imageUrl);
+          if (img) {
+            ctx.drawImage(img, 0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
+          } else {
+            ctx.fillStyle = "#222222";
+            ctx.fillRect(0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
+            ctx.font = "24px system-ui, -apple-system, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(
+              `${item.size}U - ${item.label}`,
+              CANVAS_WIDTH / (2 * SCALE),
+              currentY + slotHeight / 2
+            );
+          }
+        } else {
+          ctx.fillStyle = "#222222";
+          ctx.fillRect(0, currentY, CANVAS_WIDTH / SCALE, slotHeight);
+          ctx.font = "24px system-ui, -apple-system, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(
+            `${item.size}U - ${item.label}`,
+            CANVAS_WIDTH / (2 * SCALE),
+            currentY + slotHeight / 2
+          );
+        }
+
+        currentY += slotHeight + SPACING / SCALE;
+      }
+
+      const bannerImg = await loadImage("/rackplan-banner.svg");
+      if (bannerImg) {
+        ctx.drawImage(
+          bannerImg,
+          0,
+          currentY,
+          CANVAS_WIDTH / SCALE,
+          BANNER_HEIGHT / SCALE
+        );
+      }
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `rackplan-${new Date().toISOString().split("T")[0]}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, "image/png");
+    } catch (error) {
+      console.error("Error saving image:", error);
+      alert("Failed to save image. Please try again.");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 sticky top-6">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         <div className="relative w-full">
           <Button
             variant="outline"
@@ -187,6 +305,15 @@ export default function SettingsPanel() {
         >
           <RotateCcw className="w-4 h-4" />
           Reset
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleSaveImage}
+          disabled={items.every((item) => item.isBlank)}
+        >
+          <ImageIcon className="w-4 h-4" />
+          Image
         </Button>
       </div>
       <Card className="flex flex-col p-2 pl-3 gap-4">
