@@ -1,14 +1,7 @@
 "use client";
 
 import { useRack } from "../context/rack-context";
-import { X } from "lucide-react";
-import { Button } from "./ui/button";
-import {
-  Reorder,
-  motion,
-  AnimatePresence,
-  useDragControls,
-} from "motion/react";
+import { Reorder, motion, useDragControls } from "motion/react";
 
 interface ItemProps {
   item: {
