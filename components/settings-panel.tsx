@@ -243,8 +243,8 @@ export default function SettingsPanel() {
             <Image
               src="/loading-ring.svg"
               alt="Loading"
-              width={40}
-              height={40}
+              width={24}
+              height={24}
             />
           </div>
         ) : (
