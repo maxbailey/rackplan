@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "Pro Max 48 PoE",
   "size": 1,
-  "link": "https://amzn.to/4gRKKQI"
+  "link": "https://amzn.to/4gRKKQI",
+  "tags": ["Network Switch"]
 }

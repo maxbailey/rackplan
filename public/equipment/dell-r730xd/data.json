@@ -2,5 +2,6 @@
   "label": "Dell R730xd",
   "manufacturer": "Dell",
   "model": "R730xd",
-  "size": 2
+  "size": 2,
+  "tags": ["Server"]
 }

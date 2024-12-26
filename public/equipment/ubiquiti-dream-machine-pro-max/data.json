@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "Dream Machine Pro Max",
   "size": 1,
-  "link": "https://amzn.to/41Kd3MB"
+  "link": "https://amzn.to/41Kd3MB",
+  "tags": ["Router", "Network Switch", "NVR"]
 }

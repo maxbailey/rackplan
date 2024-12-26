@@ -2,5 +2,6 @@
   "label": "Ubiquiti Power Distribution Pro",
   "manufacturer": "Ubiquiti",
   "model": "Power Distribution Pro",
-  "size": 2
+  "size": 2,
+  "tags": ["Power Distribution Unit"]
 }

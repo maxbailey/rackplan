@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "Enterprise Network Video Recorder Pro",
   "size": 2,
-  "link": "https://amzn.to/3BMgyHS"
+  "link": "https://amzn.to/3BMgyHS",
+  "tags": ["NVR"]
 }

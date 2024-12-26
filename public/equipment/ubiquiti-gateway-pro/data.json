@@ -3,5 +3,6 @@
   "manufacturer": "Ubiquiti",
   "model": "Gateway Pro",
   "size": 1,
-  "link": "https://amzn.to/40aGIxl"
+  "link": "https://amzn.to/40aGIxl",
+  "tags": ["Router"]
 }
