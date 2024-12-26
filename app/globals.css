@@ -97,7 +97,7 @@ body {
   background-size: 800%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradientTextAnimation 10s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite alternate-reverse;
+  animation: gradientTextAnimation 45s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite alternate-reverse;
 }
 
 @keyframes gradientTextAnimation {

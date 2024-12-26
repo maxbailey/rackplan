@@ -18,6 +18,7 @@ interface EquipmentData {
   logoUrl?: string;
   vectorUrl?: string;
   avatarUrl?: string;
+  link?: string;
 }
 
 interface RackState {
@@ -122,6 +123,7 @@ export default function SettingsPanel() {
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
       vectorUrl: equipmentItem.vectorUrl,
+      link: equipmentItem.link,
     });
   };
 
