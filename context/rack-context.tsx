@@ -6,7 +6,7 @@ interface RackItem {
   id: string;
   label: string;
   size: number;
-  vectorUrl?: string;
+  imageUrl?: string;
   isBlank?: boolean;
   link?: string;
 }

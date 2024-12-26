@@ -13,7 +13,17 @@ export async function GET() {
         .map(async (dirent) => {
           const dataPath = path.join(equipmentDir, dirent.name, "data.json");
           const logoPath = path.join(equipmentDir, dirent.name, "logo.png");
-          const vectorPath = path.join(equipmentDir, dirent.name, "vector.svg");
+          const imageSvgPath = path.join(
+            equipmentDir,
+            dirent.name,
+            "image.svg"
+          );
+          const imagePngPath = path.join(
+            equipmentDir,
+            dirent.name,
+            "image.png"
+          );
+
           try {
             const fileContent = await fs.readFile(dataPath, "utf-8");
             const data = JSON.parse(fileContent);
@@ -26,12 +36,17 @@ export async function GET() {
               // skip
             }
 
-            let vectorUrl = undefined;
+            let imageUrl = undefined;
             try {
-              await fs.access(vectorPath);
-              vectorUrl = `/equipment/${dirent.name}/vector.svg`;
+              await fs.access(imageSvgPath);
+              imageUrl = `/equipment/${dirent.name}/image.svg`;
             } catch {
-              // skip
+              try {
+                await fs.access(imagePngPath);
+                imageUrl = `/equipment/${dirent.name}/image.png`;
+              } catch {
+                // skip
+              }
             }
 
             let avatarUrl = undefined;
@@ -47,13 +62,14 @@ export async function GET() {
               // skip
             }
 
-            return {
+            const result = {
               id: dirent.name,
               ...data,
-              ...(vectorUrl && { vectorUrl }),
+              ...(imageUrl && { imageUrl }),
               ...(logoUrl && { logoUrl }),
               ...(avatarUrl && { avatarUrl }),
             };
+            return result;
           } catch (error) {
             console.error(`Error reading ${dataPath}:`, error);
             return null;

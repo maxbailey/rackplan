@@ -21,7 +21,7 @@ interface EquipmentData {
   size: string;
   color: string;
   logoUrl?: string;
-  vectorUrl?: string;
+  imageUrl?: string;
 }
 
 interface CommandMenuProps {
@@ -61,7 +61,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
         id: item.id,
         label: item.label,
         size: item.size,
-        vectorUrl: item.vectorUrl,
+        imageUrl: item.imageUrl,
         isBlank: item.isBlank,
       })),
     };
@@ -123,7 +123,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
       id: `${equipmentItem.id}-${Date.now()}`,
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
-      vectorUrl: equipmentItem.vectorUrl,
+      imageUrl: equipmentItem.imageUrl,
     });
     setOpen(false);
   };
