@@ -99,6 +99,23 @@ export default function SettingsPanel() {
   };
 
   useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        const searchInput = document.querySelector(
+          'input[type="search"]'
+        ) as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  useEffect(() => {
     const fetchEquipment = async () => {
       try {
         const response = await fetch("/api/equipment");
@@ -151,7 +168,7 @@ export default function SettingsPanel() {
     updateItems(blankSlots);
   };
 
-  const filteredEquipment = equipment.filter((item) => {
+  const filteredEquipment = (equipment || []).filter((item) => {
     if (selectedTag && (!item.tags || !item.tags.includes(selectedTag))) {
       return false;
     }
@@ -357,20 +374,20 @@ export default function SettingsPanel() {
         <Button
           variant="outline"
           className="w-full"
-          onClick={handleReset}
-          disabled={items.every((item) => item.isBlank)}
-        >
-          <RotateCcw className="w-4 h-4" />
-          Reset
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full"
           onClick={handleSaveImage}
           disabled={items.every((item) => item.isBlank)}
         >
           <ImageIcon className="w-4 h-4" />
           Image
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleReset}
+          disabled={items.every((item) => item.isBlank)}
+        >
+          <RotateCcw className="w-4 h-4" />
+          Reset
         </Button>
       </div>
       <Card className="flex flex-col p-2 pl-3 gap-4">
