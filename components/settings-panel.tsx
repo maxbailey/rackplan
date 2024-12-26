@@ -20,6 +20,7 @@ interface EquipmentData {
   imageUrl?: string;
   avatarUrl?: string;
   link?: string;
+  tags?: string[];
 }
 
 interface RackState {
@@ -146,9 +147,21 @@ export default function SettingsPanel() {
     updateItems(blankSlots);
   };
 
-  const filteredEquipment = equipment.filter((item) =>
-    item.label.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredEquipment = equipment.filter((item) => {
+    if (!searchQuery) return true;
+
+    const query = searchQuery.toLowerCase();
+    const searchableFields = [
+      item.label,
+      item.manufacturer,
+      item.model,
+      ...(item.tags || []),
+    ];
+
+    return searchableFields.some((field) =>
+      field?.toLowerCase().includes(query)
+    );
+  });
 
   const handleSaveImage = async () => {
     const rackPlanner = document.querySelector(".rack-planner");
@@ -430,6 +443,9 @@ export default function SettingsPanel() {
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {item.size}U
+                          {item.tags?.length
+                            ? ` • ${item.tags.join(", ")}`
+                            : ""}
                         </span>
                       </div>
                     </div>
