@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { DownloadIcon, FileJson, RotateCcw, Package } from "lucide-react";
 
 import {
@@ -32,6 +32,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
   const { slotCount, items, updateSlotCount, updateItems, addItem } = useRack();
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchEquipment = async () => {
@@ -39,7 +40,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
         const response = await fetch("/api/equipment");
         if (!response.ok) throw new Error("Failed to fetch equipment");
         const data = await response.json();
-        setEquipment(data);
+        setEquipment(data.equipment);
       } catch (error) {
         console.error("Error fetching equipment:", error);
       }
@@ -49,7 +50,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
   }, []);
 
   const filteredEquipment = inputValue
-    ? equipment.filter((item) =>
+    ? (equipment || []).filter((item) =>
         item.label.toLowerCase().includes(inputValue.toLowerCase())
       )
     : [];
@@ -133,9 +134,17 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
       <CommandInput
         placeholder="Search equipment or type a command..."
         value={inputValue}
-        onValueChange={setInputValue}
+        onValueChange={(value) => {
+          setInputValue(value);
+          // Reset scroll position immediately when input changes
+          if (listRef.current) {
+            setTimeout(() => {
+              listRef.current?.scrollTo(0, 0);
+            }, 0);
+          }
+        }}
       />
-      <CommandList>
+      <CommandList ref={listRef}>
         <CommandEmpty>No results found.</CommandEmpty>
         {filteredEquipment.length > 0 && (
           <CommandGroup heading="Equipment">
