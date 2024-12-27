@@ -22,6 +22,7 @@ interface EquipmentData {
   color: string;
   logoUrl?: string;
   imageUrl?: string;
+  link?: string;
 }
 
 interface CommandMenuProps {
@@ -125,6 +126,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
       label: equipmentItem.label,
       size: parseInt(equipmentItem.size),
       imageUrl: equipmentItem.imageUrl,
+      link: equipmentItem.link,
     });
     setOpen(false);
   };
