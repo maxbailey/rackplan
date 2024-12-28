@@ -21,7 +21,7 @@ export function EquipmentTags({
         <Badge
           key={tag}
           variant={selectedTag === tag ? "default" : "secondary"}
-          className={`cursor-pointer hover:opacity-80 ${
+          className={`cursor-pointer select-none hover:opacity-80 ${
             selectedTag === tag ? "" : "bg-muted hover:bg-muted"
           }`}
           onClick={() => onTagSelect(selectedTag === tag ? null : tag)}
