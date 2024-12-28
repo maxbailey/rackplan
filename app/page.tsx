@@ -1,6 +1,6 @@
 import BrandPanel from "@/components/brand-panel";
 import RackPlanner from "@/components/rack-planner";
-import SettingsPanel from "@/components/settings-panel";
+import SettingsPanel from "@/components/settings/settings-panel";
 import { RackProvider } from "@/context/rack-context";
 import { CommandDialogDemo } from "@/components/command-dialog";
 
