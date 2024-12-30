@@ -30,8 +30,8 @@ export default function RootLayout({
       <head>
         <Script
           defer
-          src="https://analytics.maxbailey.me/script.js"
-          data-website-id="dca9aacb-9fbd-4ebb-badf-30a2a651cbdd"
+          src="https://stats.rackplan.dev/script.js"
+          data-website-id="3ca9d8c3-47a0-4ce4-a81f-3177577e7d40"
         />
       </head>
       <body
