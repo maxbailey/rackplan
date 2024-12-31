@@ -5,6 +5,17 @@ import { useRack } from "../context/rack-context";
 import { Reorder, motion, useDragControls } from "motion/react";
 import Link from "next/link";
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (
+        eventName: string,
+        eventData?: Record<string, string | number>
+      ) => void;
+    };
+  }
+}
+
 interface ItemProps {
   item: {
     id: string;
@@ -20,6 +31,12 @@ interface ItemProps {
 function Item({ item, removeItem }: ItemProps) {
   const controls = useDragControls();
   const { id, label, size, imageUrl, isBlank, link } = item;
+
+  const handleBuyNowClick = () => {
+    window.umami?.track("Equipment - Buy Now Click", {
+      label,
+    });
+  };
 
   return (
     <Reorder.Item
@@ -63,7 +80,10 @@ function Item({ item, removeItem }: ItemProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm font-medium text-violet-500 hover:text-violet-600 dark:text-violet-400 dark:hover:text-violet-300 flex flex-row items-center gap-1"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBuyNowClick();
+                    }}
                   >
                     Buy Now
                   </Link>
@@ -101,12 +121,27 @@ function Item({ item, removeItem }: ItemProps) {
 export default function RackPlanner() {
   const { items, updateItems, removeItem } = useRack();
 
+  const handleReorder = (newItems: typeof items) => {
+    // Find the item that was moved by comparing the old and new arrays
+    const movedItem = newItems.find((item, index) => {
+      return item.id !== items[index]?.id && !item.isBlank;
+    });
+
+    if (movedItem) {
+      window.umami?.track("Equipment - Reorder", {
+        label: movedItem.label,
+      });
+    }
+
+    updateItems(newItems);
+  };
+
   return (
     <div className="rack-planner flex flex-col gap-1">
       <Reorder.Group
         axis="y"
         values={items}
-        onReorder={updateItems}
+        onReorder={handleReorder}
         className="flex flex-col gap-3"
         layoutScroll
       >

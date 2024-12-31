@@ -2,6 +2,17 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (
+        eventName: string,
+        eventData?: Record<string, string | number>
+      ) => void;
+    };
+  }
+}
+
 interface RackItem {
   id: string;
   label: string;
@@ -77,6 +88,10 @@ export function RackProvider({ children }: { children: ReactNode }) {
   const removeItem = (id: string) => {
     const itemToRemove = items.find((item) => item.id === id);
     if (!itemToRemove || itemToRemove.isBlank) return;
+
+    window.umami?.track("Equipment - Remove", {
+      label: itemToRemove.label,
+    });
 
     setItems((prev) => {
       const newItems = prev.filter((item) => item.id !== id);

@@ -32,15 +32,29 @@ export default function BrandPanel() {
             </div>
             <div className="flex flex-row items-center gap-2">
               {theme === "dark" ? (
-                <Button variant="ghost" onClick={() => setTheme("light")}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setTheme("light")}
+                  data-umami-event="Switch Theme"
+                  data-umami-event-theme="Light"
+                >
                   <SunIcon className="w-4 h-4" />
                 </Button>
               ) : (
-                <Button variant="ghost" onClick={() => setTheme("dark")}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setTheme("dark")}
+                  data-umami-event="Switch Theme"
+                  data-umami-event-theme="Dark"
+                >
                   <MoonIcon className="w-4 h-4" />
                 </Button>
               )}
-              <a href="https://github.com/maxbailey/rackplan" target="_blank">
+              <a
+                href="https://github.com/maxbailey/rackplan"
+                target="_blank"
+                data-umami-event="GitHub Link Click"
+              >
                 <Image
                   alt="GitHub Repo stars"
                   src="https://img.shields.io/github/stars/maxbailey/rackplan"

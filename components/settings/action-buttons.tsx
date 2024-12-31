@@ -10,6 +10,17 @@ import {
   validateRackState,
 } from "@/lib/rack-actions";
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (
+        eventName: string,
+        eventData?: Record<string, string | number>
+      ) => void;
+    };
+  }
+}
+
 interface ActionButtonsProps {
   items: RackState["items"];
   slotCount: number;
@@ -34,6 +45,7 @@ export function ActionButtons({
         if (!validateRackState(parsedState)) {
           throw new Error("Invalid rack state format");
         }
+        window.umami?.track("Action Button - Load Layout");
         onLoad(parsedState);
       } catch (error) {
         console.error("Invalid file format:", error);
@@ -47,6 +59,7 @@ export function ActionButtons({
   };
 
   const handleSave = () => {
+    window.umami?.track("Action Button - Save Layout");
     const state: RackState = {
       slotCount,
       items: items.map((item) => ({
@@ -62,7 +75,13 @@ export function ActionButtons({
   };
 
   const handleSaveImage = async () => {
+    window.umami?.track("Action Button - Create Image");
     await saveRackImage(items);
+  };
+
+  const handleReset = () => {
+    window.umami?.track("Action Button - Reset");
+    onReset();
   };
 
   return (
@@ -115,7 +134,7 @@ export function ActionButtons({
             Reset
           </Button>
         }
-        onConfirm={onReset}
+        onConfirm={handleReset}
         disabled={items.every((item) => item.isBlank)}
       />
     </div>

@@ -5,6 +5,14 @@ import { CommandDialog } from "@/components/ui/command";
 import { DialogTitle } from "@/components/ui/dialog";
 import { CommandMenu } from "@/components/command-menu";
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (eventName: string) => void;
+    };
+  }
+}
+
 export function CommandDialogDemo() {
   const [open, setOpen] = useState(false);
 
@@ -12,13 +20,16 @@ export function CommandDialogDemo() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
+        if (!open) {
+          window.umami?.track("Command Menu");
+        }
         setOpen((open) => !open);
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [open]);
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>

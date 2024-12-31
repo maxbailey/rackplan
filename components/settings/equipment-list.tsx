@@ -9,6 +9,17 @@ import { EquipmentTags } from "./equipment-tags";
 import { EquipmentItem } from "./equipment-item";
 import type { EquipmentData } from "./settings-panel";
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (
+        eventName: string,
+        eventData?: Record<string, string | number>
+      ) => void;
+    };
+  }
+}
+
 interface EquipmentListProps {
   items: {
     id: string;
@@ -55,6 +66,9 @@ export function EquipmentList({ items, onAddItem }: EquipmentListProps) {
   };
 
   const handleInsert = (equipmentItem: EquipmentData) => {
+    window.umami?.track("Equipment - Insert", {
+      label: equipmentItem.label,
+    });
     onAddItem({
       id: `${equipmentItem.id}-${Date.now()}`,
       label: equipmentItem.label,
