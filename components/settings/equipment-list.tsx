@@ -8,17 +8,7 @@ import { EquipmentSearch } from "./equipment-search";
 import { EquipmentTags } from "./equipment-tags";
 import { EquipmentItem } from "./equipment-item";
 import type { EquipmentData } from "./settings-panel";
-
-declare global {
-  interface Window {
-    umami?: {
-      track: (
-        eventName: string,
-        eventData?: Record<string, string | number>
-      ) => void;
-    };
-  }
-}
+import "@/lib/types/umami";
 
 interface EquipmentListProps {
   items: {

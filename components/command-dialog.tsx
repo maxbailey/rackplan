@@ -4,14 +4,7 @@ import { useEffect, useState } from "react";
 import { CommandDialog } from "@/components/ui/command";
 import { DialogTitle } from "@/components/ui/dialog";
 import { CommandMenu } from "@/components/command-menu";
-
-declare global {
-  interface Window {
-    umami?: {
-      track: (eventName: string) => void;
-    };
-  }
-}
+import "@/lib/types/umami";
 
 export function CommandDialogDemo() {
   const [open, setOpen] = useState(false);

@@ -1,17 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-
-declare global {
-  interface Window {
-    umami?: {
-      track: (
-        eventName: string,
-        eventData?: Record<string, string | number>
-      ) => void;
-    };
-  }
-}
+import "@/lib/types/umami";
 
 interface RackItem {
   id: string;

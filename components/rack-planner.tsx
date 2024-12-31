@@ -4,17 +4,7 @@ import { Trash2 } from "lucide-react";
 import { useRack } from "../context/rack-context";
 import { Reorder, motion, useDragControls } from "motion/react";
 import Link from "next/link";
-
-declare global {
-  interface Window {
-    umami?: {
-      track: (
-        eventName: string,
-        eventData?: Record<string, string | number>
-      ) => void;
-    };
-  }
-}
+import "@/lib/types/umami";
 
 interface ItemProps {
   item: {
