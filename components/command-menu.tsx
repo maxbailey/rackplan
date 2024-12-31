@@ -30,6 +30,17 @@ interface CommandMenuProps {
   setOpen: (open: boolean) => void;
 }
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (
+        eventName: string,
+        eventData?: Record<string, string | number>
+      ) => void;
+    };
+  }
+}
+
 export function CommandMenu({ setOpen }: CommandMenuProps) {
   const { slotCount, items, updateSlotCount, updateItems, addItem } = useRack();
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
@@ -58,6 +69,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
     : [];
 
   const handleSave = () => {
+    window.umami?.track("Command Menu - Save Layout");
     const state = {
       slotCount,
       items: items.map((item) => ({
@@ -74,6 +86,7 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
   };
 
   const handleLoad = () => {
+    window.umami?.track("Command Menu - Load Layout");
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
@@ -101,11 +114,15 @@ export function CommandMenu({ setOpen }: CommandMenuProps) {
   };
 
   const handleSaveImage = async () => {
+    window.umami?.track("Command Menu - Create Image");
     await saveRackImage(items);
     setOpen(false);
   };
 
   const handleInsert = (equipmentItem: EquipmentData) => {
+    window.umami?.track("Command Menu - Insert Equipment", {
+      label: equipmentItem.label,
+    });
     addItem({
       id: `${equipmentItem.id}-${Date.now()}`,
       label: equipmentItem.label,

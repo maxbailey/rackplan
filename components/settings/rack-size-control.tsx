@@ -6,6 +6,17 @@ import { Card } from "../ui/card";
 import { useState } from "react";
 import type { RackState } from "./settings-panel";
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (
+        eventName: string,
+        eventData?: Record<string, string | number>
+      ) => void;
+    };
+  }
+}
+
 interface RackSizeControlProps {
   slotCount: number;
   items: RackState["items"];
@@ -27,6 +38,9 @@ export function RackSizeControl({
     e.preventDefault();
     const newValue = parseInt(inputValue);
     if (!isNaN(newValue) && newValue >= 1 && newValue <= 50) {
+      window.umami?.track("Rack Size Update", {
+        size: newValue,
+      });
       onUpdateSlotCount(newValue);
     } else {
       setInputValue(slotCount.toString());
