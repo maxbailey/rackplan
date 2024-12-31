@@ -4,22 +4,12 @@ import { Button } from "../ui/button";
 import { FileJson, DownloadIcon, ImageIcon, RotateCcw } from "lucide-react";
 import type { RackState } from "./settings-panel";
 import { ResetConfirmDialog } from "@/components/reset-confirm-dialog";
+import "@/lib/types/umami";
 import {
   saveRackState,
   saveRackImage,
   validateRackState,
 } from "@/lib/rack-actions";
-
-declare global {
-  interface Window {
-    umami?: {
-      track: (
-        eventName: string,
-        eventData?: Record<string, string | number>
-      ) => void;
-    };
-  }
-}
 
 interface ActionButtonsProps {
   items: RackState["items"];

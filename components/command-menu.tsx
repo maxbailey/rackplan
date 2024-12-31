@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { DownloadIcon, FileJson, Package, ImageIcon } from "lucide-react";
+import "@/lib/types/umami";
 
 import {
   Command,
@@ -28,17 +29,6 @@ interface EquipmentData {
 
 interface CommandMenuProps {
   setOpen: (open: boolean) => void;
-}
-
-declare global {
-  interface Window {
-    umami?: {
-      track: (
-        eventName: string,
-        eventData?: Record<string, string | number>
-      ) => void;
-    };
-  }
 }
 
 export function CommandMenu({ setOpen }: CommandMenuProps) {
